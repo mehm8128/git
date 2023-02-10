@@ -22,8 +22,12 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := client.WalkHistory(hash, func(commit *object.Commit) error {
-		fmt.Println(commit)
-		fmt.Println("")
+		fmt.Printf("\x1b[33mcommit %s\x1b[0m\n", commit.Hash.String())
+		fmt.Printf("Author: %s <%s>\n", commit.Author.Name, commit.Author.Email)
+		fmt.Printf("Date:   %s\n", commit.Author.Timestamp)
+		fmt.Println()
+		fmt.Printf("    %s\n", commit.Message)
+		fmt.Println()
 		return nil
 	}); err != nil {
 		log.Fatal(err)
