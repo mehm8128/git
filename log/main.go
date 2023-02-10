@@ -4,11 +4,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+
+	"github.com/mehm8128/git/log/object"
+	"github.com/mehm8128/git/log/store"
 )
 
 func main() {
 	//hashString := os.Args[1]
-	hashString := "436b835a37fec9c43adfa03ba199484893ef6afd"
+	hashString := "8afd98be900ad45406963b3204ff1427c1e3128a"
 	hash, err := hex.DecodeString(hashString)
 	if err != nil {
 		log.Fatal(err)

@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/mehm8128/git/log/sha"
+	"github.com/mehm8128/git/log/util"
 )
 
 type Object struct {

@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mehm8128/git/log/sha"
 )
 
 type Commit struct {
@@ -138,7 +140,6 @@ func readSign(signString string) (Sign, error) {
 	}
 	location := time.FixedZone(" ", 3600*offsetHour+60*offsetMinute)
 	timestamp := time.Unix(unixTime, 0).In(location)
-	time.Now().String()
 	return Sign{
 		Name:      name,
 		Email:     email,

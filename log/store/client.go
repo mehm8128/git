@@ -4,6 +4,10 @@ import (
 	"compress/zlib"
 	"os"
 	"path/filepath"
+
+	"github.com/mehm8128/git/log/object"
+	"github.com/mehm8128/git/log/sha"
+	"github.com/mehm8128/git/log/util"
 )
 
 type Client struct {
