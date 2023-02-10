@@ -6,8 +6,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mehm8128/git/log/sha"
-	"github.com/mehm8128/git/log/util"
+	"github.com/mehm8128/git/sha"
+	"github.com/mehm8128/git/util"
 )
 
 type Object struct {

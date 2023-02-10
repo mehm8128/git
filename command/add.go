@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/mehm8128/git/log/sha"
+	"github.com/mehm8128/git/sha"
 )
 
 func compress(r io.Reader) (*bytes.Buffer, error) {
@@ -30,9 +30,12 @@ func generateObject(filename string) {
 	}
 	defer file.Close()
 	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
 
 	header := fmt.Sprintf("blob %d\x00", len(fileBytes))
-	hash := sha.Hash(append([]byte(header), fileBytes...))
+	hash := sha.SHA1(append([]byte(header), fileBytes...)).Hash()
 	hashStr := fmt.Sprintf("%x", hash)
 	fileDirectory := filepath.Join(".git", "objects", hashStr[:2])
 	filePath := filepath.Join(".git", "objects", hashStr[:2], hashStr[2:])
@@ -142,7 +145,7 @@ func updateIndex(filenames []string) {
 		if err != nil {
 			panic(err)
 		}
-		entries[i].Sha1 = sha.Hash(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...))
+		entries[i].Sha1 = sha.SHA1(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...)).Hash()
 		//todo
 		entries[i].fileNameSize = []byte{0, uint8(len(info.Name()))}
 		entries[i].Name = []byte(info.Name())
@@ -171,7 +174,7 @@ func updateIndex(filenames []string) {
 	}
 }
 
-func main() {
+func Add() {
 	for _, filename := range os.Args[1:] {
 		generateObject(filename)
 	}

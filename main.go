@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/mehm8128/git/log/object"
-	"github.com/mehm8128/git/log/store"
+	"github.com/mehm8128/git/object"
+	"github.com/mehm8128/git/store"
 )
 
 func main() {

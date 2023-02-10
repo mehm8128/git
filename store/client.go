@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mehm8128/git/log/object"
-	"github.com/mehm8128/git/log/sha"
-	"github.com/mehm8128/git/log/util"
+	"github.com/mehm8128/git/object"
+	"github.com/mehm8128/git/sha"
+	"github.com/mehm8128/git/util"
 )
 
 type Client struct {

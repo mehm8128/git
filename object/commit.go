@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehm8128/git/log/sha"
+	"github.com/mehm8128/git/sha"
 )
 
 type Commit struct {
