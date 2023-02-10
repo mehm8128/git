@@ -1,9 +1,9 @@
-package main
+package plumbing
 
 import (
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 )
 
@@ -35,8 +35,8 @@ func readEntry(bytes []byte) int64 {
 	return int64(62) + hexToInt64(filenameSize) + padding
 }
 
-func main() {
-	bytes, err := ioutil.ReadFile("./.git/index")
+func IsFiles() {
+	bytes, err := os.ReadFile("./.git/index")
 	if err != nil {
 		panic(err)
 	}

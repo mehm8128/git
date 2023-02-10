@@ -1,22 +1,17 @@
-package main
+package command
 
 import (
 	"bytes"
 	"compress/zlib"
-	"crypto/sha1"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"syscall"
-)
 
-func hashBySha1(bytes []byte) []byte {
-	sha1 := sha1.New()
-	sha1.Write(bytes)
-	return sha1.Sum(nil)
-}
+	"github.com/mehm8128/git/log/sha"
+)
 
 func compress(r io.Reader) (*bytes.Buffer, error) {
 	buf := new(bytes.Buffer)
@@ -37,7 +32,7 @@ func generateObject(filename string) {
 	fileBytes, err := io.ReadAll(file)
 
 	header := fmt.Sprintf("blob %d\x00", len(fileBytes))
-	hash := hashBySha1(append([]byte(header), fileBytes...))
+	hash := sha.Hash(append([]byte(header), fileBytes...))
 	hashStr := fmt.Sprintf("%x", hash)
 	fileDirectory := filepath.Join(".git", "objects", hashStr[:2])
 	filePath := filepath.Join(".git", "objects", hashStr[:2], hashStr[2:])
@@ -147,7 +142,7 @@ func updateIndex(filenames []string) {
 		if err != nil {
 			panic(err)
 		}
-		entries[i].Sha1 = hashBySha1(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...))
+		entries[i].Sha1 = sha.Hash(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...))
 		//todo
 		entries[i].fileNameSize = []byte{0, uint8(len(info.Name()))}
 		entries[i].Name = []byte(info.Name())

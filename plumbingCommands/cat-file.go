@@ -1,4 +1,4 @@
-package main
+package plumbing
 
 import (
 	"compress/zlib"
@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func main() {
+func CatFile() {
 	filename := os.Args[1]
 	filepath := filename[:2] + "/" + filename[2:]
 	zr, err := os.Open(fmt.Sprintf("./.git/objects/%s", filepath))

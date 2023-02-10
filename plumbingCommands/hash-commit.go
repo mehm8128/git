@@ -1,26 +1,20 @@
-package main
+package plumbing
 
 import (
-	"crypto/sha1"
 	"fmt"
-	"io/ioutil"
 	"os"
+
+	"github.com/mehm8128/git/log/sha"
 )
 
-func hashBySha1(bytes []byte) []byte {
-	sha1 := sha1.New()
-	sha1.Write(bytes)
-	return sha1.Sum(nil)
-}
-
-func main() {
+func HashCommit() {
 	filename := os.Args[1]
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	bytes = append([]byte(fmt.Sprintf("commit %d\x00", len(bytes))), bytes...)
 
-	str := hashBySha1(bytes)
+	str := sha.Hash(bytes)
 	fmt.Printf("%x\n", str)
 }
