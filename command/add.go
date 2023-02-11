@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/mehm8128/git/sha"
+	"github.com/mehm8128/git/store"
 )
 
 func compress(r io.Reader) (*bytes.Buffer, error) {
@@ -174,8 +175,8 @@ func updateIndex(filenames []string) {
 	}
 }
 
-func Add() {
-	for _, filename := range os.Args[1:] {
+func Add(client *store.Client, filenames []string) {
+	for _, filename := range filenames {
 		generateObject(filename)
 	}
 	updateIndex(os.Args[1:])

@@ -2,34 +2,30 @@ package main
 
 import (
 	"encoding/hex"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/mehm8128/git/object"
+	"github.com/mehm8128/git/command"
 	"github.com/mehm8128/git/store"
 )
 
 func main() {
-	hashString := os.Args[1]
-	hash, err := hex.DecodeString(hashString)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	client, err := store.NewClient(".")
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := client.WalkHistory(hash, func(commit *object.Commit) error {
-		fmt.Printf("\x1b[33mcommit %s\x1b[0m\n", commit.Hash.String())
-		fmt.Printf("Author: %s <%s>\n", commit.Author.Name, commit.Author.Email)
-		fmt.Printf("Date:   %s\n", commit.Author.Timestamp)
-		fmt.Println()
-		fmt.Printf("    %s\n", commit.Message)
-		fmt.Println()
-		return nil
-	}); err != nil {
-		log.Fatal(err)
+
+	commandArg := os.Args[1]
+
+	switch commandArg {
+	case "add":
+		command.Add(client, os.Args[2:])
+	case "log":
+		hashString := os.Args[2]
+		hash, err := hex.DecodeString(hashString)
+		if err != nil {
+			log.Fatal(err)
+		}
+		command.Log(client, hash)
 	}
 }
