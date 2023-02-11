@@ -74,9 +74,18 @@ type IndexEntry struct {
 
 func updateIndex(filenames []string) {
 	indexPath := filepath.Join(".git", "index")
-	fp, err := os.OpenFile(indexPath, os.O_WRONLY, 0777)
+	_, err := os.Stat(indexPath)
+	var fp *os.File
 	if err != nil {
-		panic(err)
+		fp, err = os.Create(indexPath)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fp, err = os.OpenFile(indexPath, os.O_WRONLY, 0777)
+		if err != nil {
+			panic(err)
+		}
 	}
 	defer fp.Close()
 	var header IndexHeader
@@ -168,5 +177,5 @@ func Add(client *store.Client, filenames []string) {
 	for _, filename := range filenames {
 		generateBlobObject(filename)
 	}
-	updateIndex(os.Args[1:])
+	updateIndex(filenames)
 }
