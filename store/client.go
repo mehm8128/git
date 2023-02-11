@@ -12,7 +12,7 @@ import (
 )
 
 type Client struct {
-	objectDir string
+	ObjectDir string
 }
 
 // pathをもらってルートディレクトリを探す
@@ -22,13 +22,13 @@ func NewClient(path string) (*Client, error) {
 		return nil, err
 	}
 	return &Client{
-		objectDir: filepath.Join(rootDir, ".git", "objects"),
+		ObjectDir: filepath.Join(rootDir, ".git", "objects"),
 	}, nil
 }
 
 func (c *Client) GetObject(hash util.SHA1) (*object.Object, error) {
 	hashString := hash.String()
-	objectPath := filepath.Join(c.objectDir, hashString[:2], hashString[2:])
+	objectPath := filepath.Join(c.ObjectDir, hashString[:2], hashString[2:])
 
 	objectFile, err := os.Open(objectPath)
 	if err != nil {
@@ -81,24 +81,30 @@ func (c *Client) WalkHistory(hash util.SHA1, walkFunc WalkFunc) error {
 	return nil
 }
 
-func (c *Client) GetHeadCommit() (util.SHA1, error) {
-	fp, err := os.Open(filepath.Join(c.objectDir, "HEAD"))
+func (c *Client) GetHeadRef() (string, error) {
+	fp, err := os.Open(filepath.Join(c.ObjectDir, "HEAD"))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer fp.Close()
-	//refのパスを取得してopen
 	bytes, err := io.ReadAll(fp)
+	if err != nil {
+		return "", err
+	}
+	return strings.Split(string(bytes), " ")[1], nil
+}
+
+func (c *Client) GetHeadCommit() (util.SHA1, error) {
+	headRef, err := c.GetHeadRef()
 	if err != nil {
 		return nil, err
 	}
-	headRef := strings.Split(string(bytes), " ")[1]
-	fp2, err := os.Open(filepath.Join(c.objectDir, headRef))
+	fp2, err := os.Open(filepath.Join(c.ObjectDir, headRef))
 	if err != nil {
 		return nil, err
 	}
 	defer fp2.Close()
-	bytes, err = io.ReadAll(fp2)
+	bytes, err := io.ReadAll(fp2)
 	if err != nil {
 		return nil, err
 	}

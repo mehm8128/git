@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/mehm8128/git/object"
@@ -14,7 +15,7 @@ func generateTreeObject(filename string) {
 
 }
 
-func generateCommitObject(tree util.SHA1, message string, client *store.Client) {
+func generateCommitObject(tree util.SHA1, message string, client *store.Client) util.SHA1 {
 	parent, err := client.GetHeadCommit()
 	if err != nil {
 		panic(err)
@@ -60,6 +61,23 @@ func generateCommitObject(tree util.SHA1, message string, client *store.Client) 
 	if err != nil {
 		panic(err)
 	}
+	return commit.Hash
+}
+
+func updateHead(client *store.Client, commitHash util.SHA1) {
+	headRef, err := client.GetHeadRef()
+	if err != nil {
+		panic(err)
+	}
+	fp, err := os.Open(filepath.Join(client.ObjectDir, headRef))
+	if err != nil {
+		panic(err)
+	}
+	defer fp.Close()
+	_, err = fp.Write(commitHash)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Commit(client *store.Client, filenames []string, message string) {
@@ -67,5 +85,6 @@ func Commit(client *store.Client, filenames []string, message string) {
 		generateTreeObject(filename)
 	}
 	tree := util.SHA1{}
-	generateCommitObject(tree, message, client)
+	commitHash := generateCommitObject(tree, message, client)
+	updateHead(client, commitHash)
 }
