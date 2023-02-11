@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/mehm8128/git/object"
-	"github.com/mehm8128/git/sha"
 	"github.com/mehm8128/git/util"
 )
 
@@ -25,7 +24,7 @@ func NewClient(path string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) GetObject(hash sha.SHA1) (*object.Object, error) {
+func (c *Client) GetObject(hash util.SHA1) (*object.Object, error) {
 	hashString := hash.String()
 	objectPath := filepath.Join(c.objectDir, hashString[:2], hashString[2:])
 
@@ -48,8 +47,8 @@ func (c *Client) GetObject(hash sha.SHA1) (*object.Object, error) {
 
 type WalkFunc func(commit *object.Commit) error
 
-func (c *Client) WalkHistory(hash sha.SHA1, walkFunc WalkFunc) error {
-	ancestors := []sha.SHA1{hash}
+func (c *Client) WalkHistory(hash util.SHA1, walkFunc WalkFunc) error {
+	ancestors := []util.SHA1{hash}
 	cycleCheck := map[string]struct{}{}
 
 	for len(ancestors) > 0 {

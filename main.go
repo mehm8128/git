@@ -20,6 +20,8 @@ func main() {
 	switch commandArg {
 	case "add":
 		command.Add(client, os.Args[2:])
+	case "commit":
+		command.Commit(client, os.Args[2:])
 	case "log":
 		hashString := os.Args[2]
 		hash, err := hex.DecodeString(hashString)

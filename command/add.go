@@ -2,7 +2,6 @@ package command
 
 import (
 	"bytes"
-	"compress/zlib"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -10,21 +9,11 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/mehm8128/git/sha"
 	"github.com/mehm8128/git/store"
+	"github.com/mehm8128/git/util"
 )
 
-func compress(r io.Reader) (*bytes.Buffer, error) {
-	buf := new(bytes.Buffer)
-	zw := zlib.NewWriter(buf)
-	defer zw.Close()
-	if _, err := io.Copy(zw, r); err != nil {
-		return nil, err
-	}
-	return buf, nil
-}
-
-func generateObject(filename string) {
+func generateBlobObject(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
@@ -36,11 +25,11 @@ func generateObject(filename string) {
 	}
 
 	header := fmt.Sprintf("blob %d\x00", len(fileBytes))
-	hash := sha.SHA1(append([]byte(header), fileBytes...)).Hash()
+	hash := util.SHA1(append([]byte(header), fileBytes...)).Hash()
 	hashStr := fmt.Sprintf("%x", hash)
 	fileDirectory := filepath.Join(".git", "objects", hashStr[:2])
 	filePath := filepath.Join(".git", "objects", hashStr[:2], hashStr[2:])
-	zr, err := compress(bytes.NewBufferString(header + string(fileBytes)))
+	zr, err := util.Compress(bytes.NewBufferString(header + string(fileBytes)))
 	if err != nil {
 		panic(err)
 	}
@@ -146,7 +135,7 @@ func updateIndex(filenames []string) {
 		if err != nil {
 			panic(err)
 		}
-		entries[i].Sha1 = sha.SHA1(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...)).Hash()
+		entries[i].Sha1 = util.SHA1(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...)).Hash()
 		//todo
 		entries[i].fileNameSize = []byte{0, uint8(len(info.Name()))}
 		entries[i].Name = []byte(info.Name())
@@ -177,7 +166,7 @@ func updateIndex(filenames []string) {
 
 func Add(client *store.Client, filenames []string) {
 	for _, filename := range filenames {
-		generateObject(filename)
+		generateBlobObject(filename)
 	}
 	updateIndex(os.Args[1:])
 }

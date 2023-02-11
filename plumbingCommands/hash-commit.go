@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mehm8128/git/sha"
+	"github.com/mehm8128/git/util"
 )
 
 func HashCommit() {
@@ -15,6 +15,6 @@ func HashCommit() {
 	}
 	bytes = append([]byte(fmt.Sprintf("commit %d\x00", len(bytes))), bytes...)
 
-	str := sha.SHA1(bytes).Hash()
+	str := util.SHA1(bytes).Hash()
 	fmt.Printf("%x\n", str)
 }

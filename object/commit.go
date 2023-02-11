@@ -12,14 +12,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehm8128/git/sha"
+	"github.com/mehm8128/git/util"
 )
 
 type Commit struct {
-	Hash      sha.SHA1
+	Hash      util.SHA1
 	Size      int
-	Tree      sha.SHA1
-	Parents   []sha.SHA1
+	Tree      util.SHA1
+	Parents   []util.SHA1
 	Author    Sign
 	Committer Sign
 	Message   string
@@ -109,11 +109,11 @@ func NewCommit(o *Object) (*Commit, error) {
 	return commit, nil
 }
 
-func readHash(hashString string) (sha.SHA1, error) {
+func readHash(hashString string) (util.SHA1, error) {
 	if ok := sha1Regexp.MatchString(hashString); !ok {
 		return nil, ErrInvalidCommitObject
 	}
-	hash := make(sha.SHA1, 20)
+	hash := make(util.SHA1, 20)
 	if _, err := hex.Decode(hash, []byte(hashString)); err != nil {
 		return nil, fmt.Errorf("%w : %s", ErrInvalidCommitObject, err)
 	}

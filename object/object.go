@@ -6,12 +6,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mehm8128/git/sha"
 	"github.com/mehm8128/git/util"
 )
 
 type Object struct {
-	Hash sha.SHA1
+	Hash util.SHA1
 	Type Type
 	Size int
 	Data []byte

@@ -1,6 +1,8 @@
 package util
 
-import "io"
+import (
+	"io"
+)
 
 func ReadNullTerminatedString(r io.Reader) (string, error) {
 	str := make([]byte, 0)
