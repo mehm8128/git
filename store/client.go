@@ -2,8 +2,10 @@ package store
 
 import (
 	"compress/zlib"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/mehm8128/git/object"
 	"github.com/mehm8128/git/util"
@@ -77,4 +79,28 @@ func (c *Client) WalkHistory(hash util.SHA1, walkFunc WalkFunc) error {
 	}
 
 	return nil
+}
+
+func (c *Client) GetHeadCommit() (util.SHA1, error) {
+	fp, err := os.Open(filepath.Join(c.objectDir, "HEAD"))
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+	//refのパスを取得してopen
+	bytes, err := io.ReadAll(fp)
+	if err != nil {
+		return nil, err
+	}
+	headRef := strings.Split(string(bytes), " ")[1]
+	fp2, err := os.Open(filepath.Join(c.objectDir, headRef))
+	if err != nil {
+		return nil, err
+	}
+	defer fp2.Close()
+	bytes, err = io.ReadAll(fp2)
+	if err != nil {
+		return nil, err
+	}
+	return util.SHA1(bytes), nil
 }

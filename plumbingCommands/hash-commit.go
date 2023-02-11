@@ -15,6 +15,6 @@ func HashCommit() {
 	}
 	bytes = append([]byte(fmt.Sprintf("commit %d\x00", len(bytes))), bytes...)
 
-	str := util.SHA1(bytes).Hash()
+	str := util.Hash(bytes)
 	fmt.Printf("%x\n", str)
 }

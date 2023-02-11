@@ -11,8 +11,8 @@ func (s SHA1) String() string {
 	return hex.EncodeToString(s)
 }
 
-func (s SHA1) Hash() []byte {
+func Hash(bytes []byte) SHA1 {
 	sha1 := sha1.New()
-	sha1.Write(s)
+	sha1.Write(bytes)
 	return sha1.Sum(nil)
 }

@@ -32,7 +32,7 @@ type Sign struct {
 }
 
 func (s Sign) String() string {
-	return fmt.Sprintf("%s %s %s", s.Name, s.Email, s.Timestamp.String())
+	return fmt.Sprintf("%s <%s> %s", s.Name, s.Email, s.Timestamp.String())
 }
 
 var (

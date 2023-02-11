@@ -25,7 +25,7 @@ func generateBlobObject(filename string) {
 	}
 
 	header := fmt.Sprintf("blob %d\x00", len(fileBytes))
-	hash := util.SHA1(append([]byte(header), fileBytes...)).Hash()
+	hash := util.Hash(append([]byte(header), fileBytes...))
 	hashStr := fmt.Sprintf("%x", hash)
 	fileDirectory := filepath.Join(".git", "objects", hashStr[:2])
 	filePath := filepath.Join(".git", "objects", hashStr[:2], hashStr[2:])
@@ -144,7 +144,7 @@ func updateIndex(filenames []string) {
 		if err != nil {
 			panic(err)
 		}
-		entries[i].Sha1 = util.SHA1(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...)).Hash()
+		entries[i].Sha1 = util.Hash(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...))
 		//todo
 		entries[i].fileNameSize = []byte{0, uint8(len(info.Name()))}
 		entries[i].Name = []byte(info.Name())
