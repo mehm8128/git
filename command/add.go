@@ -13,34 +13,34 @@ import (
 	"github.com/mehm8128/git/util"
 )
 
-func generateBlobObject(filename string) {
-	file, err := os.Open(filename)
+func generateBlobObject(filename string) error {
+	fileBytes, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
-	fileBytes, err := io.ReadAll(file)
-	if err != nil {
-		panic(err)
-	}
-
+	//データの準備
 	header := fmt.Sprintf("blob %d\x00", len(fileBytes))
 	hash := util.Hash(append([]byte(header), fileBytes...))
 	hashStr := fmt.Sprintf("%x", hash)
+
+	//ファイルの準備
 	fileDirectory := filepath.Join(".git", "objects", hashStr[:2])
 	filePath := filepath.Join(".git", "objects", hashStr[:2], hashStr[2:])
 	zr, err := util.Compress(bytes.NewBufferString(header + string(fileBytes)))
 	if err != nil {
 		panic(err)
 	}
-	if f, err := os.Stat(fileDirectory); os.IsNotExist(err) || !f.IsDir() {
+	//ディレクトリの存在確認と準備
+	if _, err := os.Stat(fileDirectory); err != nil {
 		if err := os.Mkdir(fileDirectory, 0777); err != nil {
 			panic(err)
 		}
 	}
-	if f, err := os.Stat(filePath); !os.IsNotExist(err) && !f.IsDir() {
-		panic(err)
+	//ファイルの存在確認
+	if _, err := os.Stat(filePath); err == nil {
+		panic("file already exists")
 	}
+	//書き込み
 	fp, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
@@ -49,6 +49,7 @@ func generateBlobObject(filename string) {
 	if _, err := io.Copy(fp, zr); err != nil {
 		panic(err)
 	}
+	return nil
 }
 
 type IndexHeader struct {
@@ -72,7 +73,8 @@ type IndexEntry struct {
 	Name            []byte
 }
 
-func updateIndex(filenames []string) {
+func updateIndex(filenames []string) error {
+	//存在確認とファイルの準備
 	indexPath := filepath.Join(".git", "index")
 	_, err := os.Stat(indexPath)
 	var fp *os.File
@@ -88,6 +90,10 @@ func updateIndex(filenames []string) {
 		}
 	}
 	defer fp.Close()
+
+	//データの準備
+
+	//ヘッダーの準備
 	var header IndexHeader
 	header.Signature = make([]byte, 4)
 	header.Version = make([]byte, 4)
@@ -101,6 +107,7 @@ func updateIndex(filenames []string) {
 	headerByte = append(headerByte, header.Version[:]...)
 	headerByte = append(headerByte, header.EntryCount[:]...)
 
+	//エントリーの準備
 	content := make([]byte, 0)
 	content = append(content, headerByte...)
 
@@ -110,11 +117,10 @@ func updateIndex(filenames []string) {
 		if err != nil {
 			panic(err)
 		}
-		file, err := os.Open(filename)
+		fileByte, err := os.ReadFile(filename)
 		if err != nil {
 			panic(err)
 		}
-		defer file.Close()
 
 		entries[i].Ctime = make([]byte, 4)
 		entries[i].CtimeNanosecond = make([]byte, 4)
@@ -140,10 +146,6 @@ func updateIndex(filenames []string) {
 		binary.BigEndian.PutUint32(entries[i].Gid, uint32(info.Sys().(*syscall.Stat_t).Gid))
 		binary.BigEndian.PutUint32(entries[i].FileSize, uint32(info.Size()))
 
-		fileByte, err := io.ReadAll(file)
-		if err != nil {
-			panic(err)
-		}
 		entries[i].Sha1 = util.Hash(append([]byte(fmt.Sprintf("blob %d\x00", len(fileByte))), fileByte...))
 		//todo
 		entries[i].fileNameSize = []byte{0, uint8(len(info.Name()))}
@@ -171,11 +173,18 @@ func updateIndex(filenames []string) {
 	if _, err := fp.Write(content); err != nil {
 		panic(err)
 	}
+	return nil
 }
 
 func Add(client *store.Client, filenames []string) {
 	for _, filename := range filenames {
-		generateBlobObject(filename)
+		err := generateBlobObject(filename)
+		if err != nil {
+			panic(err)
+		}
 	}
-	updateIndex(filenames)
+	err := updateIndex(filenames)
+	if err != nil {
+		panic(err)
+	}
 }

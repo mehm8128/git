@@ -2,7 +2,6 @@ package store
 
 import (
 	"compress/zlib"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -82,12 +81,7 @@ func (c *Client) WalkHistory(hash util.SHA1, walkFunc WalkFunc) error {
 }
 
 func (c *Client) GetHeadRef() (string, error) {
-	fp, err := os.Open(filepath.Join(c.ObjectDir, "HEAD"))
-	if err != nil {
-		return "", err
-	}
-	defer fp.Close()
-	bytes, err := io.ReadAll(fp)
+	bytes, err := os.ReadFile(filepath.Join(c.ObjectDir, "HEAD"))
 	if err != nil {
 		return "", err
 	}
@@ -99,12 +93,7 @@ func (c *Client) GetHeadCommit() (util.SHA1, error) {
 	if err != nil {
 		return nil, err
 	}
-	fp2, err := os.Open(filepath.Join(c.ObjectDir, headRef))
-	if err != nil {
-		return nil, err
-	}
-	defer fp2.Close()
-	bytes, err := io.ReadAll(fp2)
+	bytes, err := os.ReadFile(filepath.Join(c.ObjectDir, headRef))
 	if err != nil {
 		return nil, err
 	}
