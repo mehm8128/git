@@ -69,7 +69,7 @@ func updateHead(client *store.Client, commitHash util.SHA1) {
 	if err != nil {
 		panic(err)
 	}
-	fp, err := os.Open(filepath.Join(client.ObjectDir, headRef))
+	fp, err := os.Open(filepath.Join(client.RootDir, "objects", headRef))
 	if err != nil {
 		panic(err)
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 type Client struct {
-	ObjectDir string
+	RootDir string
 }
 
 // pathをもらってルートディレクトリを探す
@@ -21,13 +21,13 @@ func NewClient(path string) (*Client, error) {
 		return nil, err
 	}
 	return &Client{
-		ObjectDir: filepath.Join(rootDir, ".git", "objects"),
+		RootDir: rootDir,
 	}, nil
 }
 
 func (c *Client) GetObject(hash util.SHA1) (*object.Object, error) {
 	hashString := hash.String()
-	objectPath := filepath.Join(c.ObjectDir, hashString[:2], hashString[2:])
+	objectPath := filepath.Join(c.RootDir, "objects", hashString[:2], hashString[2:])
 
 	objectFile, err := os.Open(objectPath)
 	if err != nil {
@@ -81,7 +81,7 @@ func (c *Client) WalkHistory(hash util.SHA1, walkFunc WalkFunc) error {
 }
 
 func (c *Client) GetHeadRef() (string, error) {
-	bytes, err := os.ReadFile(filepath.Join(c.ObjectDir, "HEAD"))
+	bytes, err := os.ReadFile(filepath.Join(c.RootDir, "HEAD"))
 	if err != nil {
 		return "", err
 	}
@@ -93,7 +93,7 @@ func (c *Client) GetHeadCommit() (util.SHA1, error) {
 	if err != nil {
 		return nil, err
 	}
-	bytes, err := os.ReadFile(filepath.Join(c.ObjectDir, headRef))
+	bytes, err := os.ReadFile(filepath.Join(c.RootDir, headRef))
 	if err != nil {
 		return nil, err
 	}

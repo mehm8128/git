@@ -10,12 +10,18 @@ import (
 )
 
 func main() {
+	commandArg := os.Args[1]
+
+	if commandArg == "init" {
+		//todo:store.NewClientで存在していないエラーのときだけinitする→エラーを定数として用意しておく
+		command.Init()
+		return
+	}
+
 	client, err := store.NewClient(".")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	commandArg := os.Args[1]
 
 	switch commandArg {
 	case "add":
